@@ -56,8 +56,8 @@ namespace TouhouKeyRemap.Config {
             for(; (line = _reader.ReadLine()) != null; lineNo++) {
                 line = line.Trim();
 
-                if(line[0] == '#') continue;
                 if(string.IsNullOrWhiteSpace(line)) continue;
+                if(line[0] == '#') continue;
 
                 int colonPos = line.IndexOf(':');
                 if(colonPos < 0) return SetError("No parameter name found");
