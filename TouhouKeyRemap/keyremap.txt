@@ -1,0 +1,4 @@
+﻿for: th06 th06e th07 th08 th09 th10 th11 th12 th13 th14 th15 th16 th17
+
+#Mapping: W→up  S→down  A→left  D→right  L→Z  '→X  ,→Z  /→X  Space→LShift
+map: 57h,26h 53h,28h 41h,25h 44h,27h 4Ch,5Ah DEh,58h BCh,5Ah BFh,58h 20h,A0h
