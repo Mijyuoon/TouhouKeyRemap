@@ -57,6 +57,7 @@ namespace TouhouKeyRemap.Config {
                 line = line.Trim();
 
                 if(line[0] == '#') continue;
+                if(string.IsNullOrWhiteSpace(line)) continue;
 
                 int colonPos = line.IndexOf(':');
                 if(colonPos < 0) return SetError("No parameter name found");
