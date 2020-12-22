@@ -62,7 +62,7 @@ namespace TouhouKeyRemap {
 
                 ReadHookVkCode(lParam, out vkCode);
 
-                if(!_config.KeyRemap.TryGetValue(vkCode, out remap)) {
+                if(_config.KeyRemap.TryGetValue(vkCode, out remap)) {
                     SimulateKeyInput(remap.Vk, false);
                     return (IntPtr)(-1);
                 }
