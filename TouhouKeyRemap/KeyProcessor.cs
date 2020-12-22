@@ -37,25 +37,37 @@ namespace TouhouKeyRemap {
 
             uint vkCode;
             RemapData remap;
+            RescaleData rescale;
 
             switch((WinAPI.MSGType)wParam) {
             case WinAPI.MSGType.WM_KEYDOWN:
                 if(!CheckCurrentProcess()) goto exit;
 
                 ReadHookVkCode(lParam, out vkCode);
-                if(!_config.KeyRemap.TryGetValue(vkCode, out remap)) goto exit;
 
-                SimulateKeyInput(remap.Vk, true);
-                return (IntPtr)(-1);
+                if(_config.KeyRemap.TryGetValue(vkCode, out remap)) {
+                    SimulateKeyInput(remap.Vk, true);
+                    return (IntPtr)(-1);
+                }
+
+                if(_config.KeyRescale.TryGetValue(vkCode, out rescale)) {
+                    SetWindowSize(rescale.X, rescale.Y);
+                    return (IntPtr)(-1);
+                }
+
+                goto exit;
 
             case WinAPI.MSGType.WM_KEYUP:
                 if(!CheckCurrentProcess()) goto exit;
 
                 ReadHookVkCode(lParam, out vkCode);
-                if(!_config.KeyRemap.TryGetValue(vkCode, out remap)) goto exit;
 
-                SimulateKeyInput(remap.Vk, false);
-                return (IntPtr)(-1);
+                if(!_config.KeyRemap.TryGetValue(vkCode, out remap)) {
+                    SimulateKeyInput(remap.Vk, false);
+                    return (IntPtr)(-1);
+                }
+
+                goto exit;
             }
 
         exit:
@@ -84,18 +96,27 @@ namespace TouhouKeyRemap {
 
             if((vkCode & 0x100) > 0) {
                 flags |= WinAPI.KEYBDINPUTFlags.KEYEVENTF_EXTENDEDKEY;
+                vkCode &= 0xFF;
             }
 
-            var scCode = WinAPI.MapVirtualKey(vkCode, WinAPI.MAPVKType.MAPVK_VK_TO_VSC);
+            var scCode = WinAPI.MapVirtualKey(vkCode & 0x7FFF, WinAPI.MAPVKType.MAPVK_VK_TO_VSC);
 
             var input = new WinAPI.INPUT();
             input.type = WinAPI.INPUTType.INPUT_KEYBOARD;
             input.ds.ki = new WinAPI.KEYBDINPUT {
                 dwFlags = (uint)flags,
                 wScan = (ushort)scCode,
+                wVk = (ushort)vkCode,
             };
 
             WinAPI.SendInput(1, new[] { input }, Marshal.SizeOf<WinAPI.INPUT>());
+        }
+
+        private void SetWindowSize(uint x, uint y) {
+            IntPtr hWnd = WinAPI.GetForegroundWindow();
+
+            WinAPI.SetWindowPos(hWnd, IntPtr.Zero, 0, 0, (int)x, (int)y,
+                WinAPI.SETWINDOWPOSFlags.SWP_NOMOVE | WinAPI.SETWINDOWPOSFlags.SWP_NOZORDER);
         }
     }
 }

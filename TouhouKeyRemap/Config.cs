@@ -15,8 +15,8 @@ namespace TouhouKeyRemap.Config {
     }
 
     struct RescaleData {
-        public int X;
-        public int Y;
+        public uint X;
+        public uint Y;
     }
 
     struct ConfigData {
@@ -43,6 +43,7 @@ namespace TouhouKeyRemap.Config {
             config = new ConfigData {
                 EnableFor = new HashSet<string>(),
                 KeyRemap = new Dictionary<uint, RemapData>(),
+                KeyRescale = new Dictionary<uint, RescaleData>(),
             };
 
             string line;
@@ -83,6 +84,24 @@ namespace TouhouKeyRemap.Config {
 
                             config.KeyRemap[num1] = new RemapData { Vk = num2 };
                         }
+                    }
+                    break;
+                    
+                case "scale":
+                    foreach(var entry in value.Split(OuterSep, StringSplitOptions.RemoveEmptyEntries)) {
+                        var values = entry.Split(InnerSep, StringSplitOptions.None);
+                        if(values.Length != 3) return SetError($"Invalid entry format: {entry}");
+
+                        if(!ReadNumber(values[0], out uint num1))
+                            return SetError($"Cannot parse number: {values[0]}");
+
+                        if(!ReadNumber(values[1], out uint num2))
+                            return SetError($"Cannot parse number: {values[1]}");
+
+                        if(!ReadNumber(values[2], out uint num3))
+                            return SetError($"Cannot parse number: {values[2]}");
+
+                        config.KeyRescale[num1] = new RescaleData { X = num2, Y = num3 };
                     }
                     break;
 

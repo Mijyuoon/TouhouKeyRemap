@@ -106,6 +106,12 @@ namespace TouhouKeyRemap.Extern {
             MAPVK_VSC_TO_VK_EX = 3,
         }
 
+        [Flags]
+        public enum SETWINDOWPOSFlags : uint {
+            SWP_NOMOVE = 0x0002,
+            SWP_NOZORDER = 0x0004,
+        }
+
         public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
@@ -129,5 +135,9 @@ namespace TouhouKeyRemap.Extern {
 
         [DllImport("user32.dll")]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int w, int h, SETWINDOWPOSFlags flags);
     }
 }
