@@ -10,6 +10,8 @@ using TouhouKeyRemap.Extern;
 
 namespace TouhouKeyRemap {
     class KeyProcessor {
+        private readonly IntPtr HookIgnore = (IntPtr)(-1);
+
         private readonly ConfigData _config;
 
         private IntPtr _hookHandle;
@@ -35,43 +37,49 @@ namespace TouhouKeyRemap {
         private IntPtr WindowsHookProc(int nCode, IntPtr wParam, IntPtr lParam) {
             if(nCode < 0) goto exit;
 
-            uint vkCode;
-            RemapData remap;
-            RescaleData rescale;
-
             switch((WinAPI.MSGType)wParam) {
             case WinAPI.MSGType.WM_KEYDOWN:
-                if(!CheckCurrentProcess()) goto exit;
-
-                ReadHookVkCode(lParam, out vkCode);
-
-                if(_config.KeyRemap.TryGetValue(vkCode, out remap)) {
-                    SimulateKeyInput(remap.Vk, true);
-                    return (IntPtr)(-1);
-                }
-
-                if(_config.KeyRescale.TryGetValue(vkCode, out rescale)) {
-                    SetWindowSize(rescale.X, rescale.Y);
-                    return (IntPtr)(-1);
-                }
-
-                goto exit;
+                if(HandleKeyDown(lParam)) return HookIgnore;
+                break;
 
             case WinAPI.MSGType.WM_KEYUP:
-                if(!CheckCurrentProcess()) goto exit;
-
-                ReadHookVkCode(lParam, out vkCode);
-
-                if(_config.KeyRemap.TryGetValue(vkCode, out remap)) {
-                    SimulateKeyInput(remap.Vk, false);
-                    return (IntPtr)(-1);
-                }
-
-                goto exit;
+                if(HandleKeyUp(lParam)) return HookIgnore;
+                break;
             }
 
         exit:
             return WinAPI.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+        }
+
+        private bool HandleKeyDown(IntPtr lParam) {
+            if(!CheckCurrentProcess()) return false;
+
+            ReadHookVkCode(lParam, out uint vkCode);
+
+            if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
+                SimulateKeyInput(remap.Vk, true);
+                return true;
+            }
+
+            if(_config.KeyRescale.TryGetValue(vkCode, out RescaleData rescale)) {
+                SetWindowSize(rescale.X, rescale.Y);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool HandleKeyUp(IntPtr lParam) {
+            if(!CheckCurrentProcess()) return false;
+
+            ReadHookVkCode(lParam, out uint vkCode);
+
+            if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
+                SimulateKeyInput(remap.Vk, false);
+                return true;
+            }
+
+            return false;
         }
 
         private bool CheckCurrentProcess() {
