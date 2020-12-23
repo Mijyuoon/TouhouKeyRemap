@@ -3,5 +3,8 @@
 #Mapping: W→up  S→down  A→left  D→right  L→Z  '→X  ,→Z  /→X  Space→LShift
 map: 57h,26h 53h,28h 41h,25h 44h,27h 4Ch,5Ah DEh,58h BCh,5Ah BFh,58h 20h,A0h
 
-#Resize: F12→1280×960
-scale: 7Bh,1280,960
+#Toggle: ;→Z  .→Z
+tmap: BAh,5Ah BEh,5Ah
+
+#Resize: F12→1280×960  F11→960×720
+scale: 7Bh,1280,960 7Ah,960,720

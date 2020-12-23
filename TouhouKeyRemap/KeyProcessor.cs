@@ -13,12 +13,14 @@ namespace TouhouKeyRemap {
         private readonly IntPtr HookIgnore = (IntPtr)(-1);
 
         private readonly ConfigData _config;
+        private readonly HashSet<uint> _downKeys;
 
         private IntPtr _hookHandle;
         private WinAPI.LowLevelKeyboardProc _hookFunc;
 
         public KeyProcessor(ConfigData config) {
             _config = config;
+            _downKeys = new HashSet<uint>();
         }
 
         public void Initialize() {
@@ -57,7 +59,19 @@ namespace TouhouKeyRemap {
             ReadHookVkCode(lParam, out uint vkCode);
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
-                SimulateKeyInput(remap.Vk, true);
+                if(!remap.Toggle) {
+                    SimulateKeyInput(remap.Vk, true);
+                    return true;
+                }
+
+                if(_downKeys.Contains(remap.Vk)) {
+                    SimulateKeyInput(remap.Vk, false);
+                    _downKeys.Remove(remap.Vk);
+                } else {
+                    SimulateKeyInput(remap.Vk, true);
+                    _downKeys.Add(remap.Vk);
+                }
+
                 return true;
             }
 
@@ -75,10 +89,15 @@ namespace TouhouKeyRemap {
             ReadHookVkCode(lParam, out uint vkCode);
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
-                SimulateKeyInput(remap.Vk, false);
+                if(!remap.Toggle) {
+                    SimulateKeyInput(remap.Vk, false);
+                    _downKeys.Remove(remap.Vk);
+                }
+
                 return true;
             }
 
+            _downKeys.Remove(vkCode);
             return false;
         }
 

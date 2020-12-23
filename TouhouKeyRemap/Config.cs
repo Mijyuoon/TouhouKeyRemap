@@ -12,6 +12,7 @@ namespace TouhouKeyRemap.Config {
 
     struct RemapData {
         public uint Vk;
+        public bool Toggle;
     }
 
     struct RescaleData {
@@ -66,6 +67,8 @@ namespace TouhouKeyRemap.Config {
                 string name = line.Substring(0, colonPos);
                 string value = line.Substring(colonPos + 1);
 
+                bool remapToggle = false;
+
                 switch(name) {
                 case "for":
                     config.EnableFor.UnionWith(value.Split(OuterSep, StringSplitOptions.RemoveEmptyEntries));
@@ -82,10 +85,14 @@ namespace TouhouKeyRemap.Config {
                             if(!ReadNumber(values[1], out uint num2))
                                 return SetError($"Cannot parse number: {values[1]}");
 
-                            config.KeyRemap[num1] = new RemapData { Vk = num2 };
+                            config.KeyRemap[num1] = new RemapData { Vk = num2, Toggle = remapToggle };
                         }
                     }
                     break;
+
+                case "tmap":
+                    remapToggle = true;
+                    goto case "map";
                     
                 case "scale":
                     foreach(var entry in value.Split(OuterSep, StringSplitOptions.RemoveEmptyEntries)) {
