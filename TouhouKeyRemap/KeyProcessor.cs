@@ -115,7 +115,9 @@ namespace TouhouKeyRemap {
         }
 
         private void SimulateKeyInput(uint vkCode, bool keyDown) {
-            var flags = WinAPI.KEYBDINPUTFlags.KEYEVENTF_SCANCODE;
+            var flags = _config.UseScancode
+                ? WinAPI.KEYBDINPUTFlags.KEYEVENTF_SCANCODE
+                : WinAPI.KEYBDINPUTFlags.KEYEVENTF_None;
 
             if(!keyDown) {
                 flags |= WinAPI.KEYBDINPUTFlags.KEYEVENTF_KEYUP;

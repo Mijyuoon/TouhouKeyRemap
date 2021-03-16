@@ -17,6 +17,9 @@ The following options are supported:
 - `scale` — space-separated list of number triplets, where the first number specifies the hotkey (same way as in `map` option) and the remaining two specify the desired
   width and height. When the hotkey is triggered the active window will be resized to the specified size.
   Example value: `scale: 7Bh,1280,960`, this would resize the active window to 1280×960 when *F12* is pressed.
+- `scancode` — boolean flag that enables or disables injecting raw key scancodes instead of virtual key codes. Scancode mode is preferred and enabled by default, however
+  some games might require disabling it when trying to remap certain keys. In particular, this was observed when remapping arrow keys in some Unity games.
+  Example value: `scancode: false`, this would switch keystroke injector to using virtual key codes.
 
 Example config file (can also be found in the repo itself):
 ```
@@ -30,4 +33,6 @@ tmap: BAh,5Ah BEh,5Ah
 
 #Resize: F12→1280×960  F11→960×720
 scale: 7Bh,1280,960 7Ah,960,720
+
+scancode: true
 ```

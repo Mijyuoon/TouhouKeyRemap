@@ -75,6 +75,7 @@ namespace TouhouKeyRemap.Extern {
 
         [Flags]
         public enum KEYBDINPUTFlags : uint {
+            KEYEVENTF_None = 0x00,
             KEYEVENTF_EXTENDEDKEY = 0x01,
             KEYEVENTF_KEYUP = 0x02,
             KEYEVENTF_UNICODE = 0x04,

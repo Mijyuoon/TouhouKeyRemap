@@ -8,3 +8,5 @@ tmap: BAh,5Ah BEh,5Ah
 
 #Resize: F12→1280×960  F11→960×720
 scale: 7Bh,1280,960 7Ah,960,720
+
+scancode: true

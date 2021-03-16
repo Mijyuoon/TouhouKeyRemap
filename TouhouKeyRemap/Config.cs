@@ -24,6 +24,8 @@ namespace TouhouKeyRemap.Config {
         public ISet<string> EnableFor;
         public IDictionary<uint, RemapData> KeyRemap;
         public IDictionary<uint, RescaleData> KeyRescale;
+
+        public bool UseScancode;
     }
 
     #endregion
@@ -45,6 +47,8 @@ namespace TouhouKeyRemap.Config {
                 EnableFor = new HashSet<string>(),
                 KeyRemap = new Dictionary<uint, RemapData>(),
                 KeyRescale = new Dictionary<uint, RescaleData>(),
+
+                UseScancode = true,
             };
 
             string line;
@@ -110,6 +114,14 @@ namespace TouhouKeyRemap.Config {
 
                         config.KeyRescale[num1] = new RescaleData { X = num2, Y = num3 };
                     }
+                    break;
+
+                case "scancode":
+                    if(!bool.TryParse(value, out var flag)) {
+                        return SetError($"Cannot parse flag: {value}");
+                    }
+
+                    config.UseScancode = flag;
                     break;
 
                 default:
