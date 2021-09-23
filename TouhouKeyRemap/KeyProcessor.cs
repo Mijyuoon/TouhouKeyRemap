@@ -59,6 +59,8 @@ namespace TouhouKeyRemap {
             ReadHookVkCode(lParam, out uint vkCode);
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
+                if(remap.Vk == 0x00) return true;
+                
                 if(!remap.Toggle) {
                     SimulateKeyInput(remap.Vk, true);
                     return true;
@@ -89,6 +91,8 @@ namespace TouhouKeyRemap {
             ReadHookVkCode(lParam, out uint vkCode);
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
+                if(remap.Vk == 0x00) return true;
+                
                 if(!remap.Toggle) {
                     SimulateKeyInput(remap.Vk, false);
                     _downKeys.Remove(remap.Vk);

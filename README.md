@@ -10,7 +10,8 @@ The following options are supported:
   Example value: `for: th06 th07 th08`, this would enable the remapping for any window belonging to a process `th06.exe`, `th07.exe` or `th08.exe`.
   (And yes, if your process name contains whitespace you're SOL.)
 - `map` — space-separated list of number pairs, specifying source and target [virtual key codes](https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
-  for which to perform the remapping. Supports both decimal and hexadecimal (by suffixing with `h`) number formats.
+  for which to perform the remapping. Supports both decimal and hexadecimal (by suffixing with `h`) number formats. Using the value `0` for the target key will suppress
+  all key down and up events for the source key, effectively disabling it.
   Example value: `map: 57h,26h 53h,28h 41h,25h 44h,27h`, this would remap *W*, *S*, *A*, *D* to *up*, *down*, *left* and *right* arrows respectively.
 - `tmap` – same as `map` but alternates the key state between pressed and released states on each trigger.
   Example value: `tmap: BAh,5Ah`, this would toggle the state of *Z* key when *semicolon* is pressed.
