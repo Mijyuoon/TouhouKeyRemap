@@ -56,7 +56,9 @@ namespace TouhouKeyRemap {
         private bool HandleKeyDown(IntPtr lParam) {
             if(!CheckCurrentProcess()) return false;
 
-            ReadHookVkCode(lParam, out uint vkCode);
+            ReadHookVkCode(lParam, out var vkCode, out var flags);
+            
+            if((flags & WinAPI.KBDLLHOOKFlags.LLKHF_INJECTED) != 0) return false;
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
                 if(remap.Vk == 0x00) return true;
@@ -88,7 +90,9 @@ namespace TouhouKeyRemap {
         private bool HandleKeyUp(IntPtr lParam) {
             if(!CheckCurrentProcess()) return false;
 
-            ReadHookVkCode(lParam, out uint vkCode);
+            ReadHookVkCode(lParam, out var vkCode, out var flags);
+
+            if((flags & WinAPI.KBDLLHOOKFlags.LLKHF_INJECTED) != 0) return false;
 
             if(_config.KeyRemap.TryGetValue(vkCode, out RemapData remap)) {
                 if(remap.Vk == 0x00) return true;
@@ -113,9 +117,10 @@ namespace TouhouKeyRemap {
             return _config.EnableFor.Contains(process.ProcessName);
         }
 
-        private void ReadHookVkCode(IntPtr lParam, out uint vkCode) {
+        private void ReadHookVkCode(IntPtr lParam, out uint vkCode, out WinAPI.KBDLLHOOKFlags flags) {
             var info = (WinAPI.KBDLLHOOK)Marshal.PtrToStructure(lParam, typeof(WinAPI.KBDLLHOOK));
             vkCode = info.vkCode;
+            flags = info.flags;
         }
 
         private void SimulateKeyInput(uint vkCode, bool keyDown) {
